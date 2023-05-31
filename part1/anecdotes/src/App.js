@@ -13,8 +13,34 @@ const App = () => {
 	];
 
 	const [selected, setSelected] = useState(0);
+	const [voteArray, setVoteArray] = useState(new Uint8Array(anecdotes.length));
+	const [mostVotesIndex, setMostVotesIndex] = useState(0);
 
-	return <div>{anecdotes[selected]}</div>;
+	const handleSelected = () => {
+		const randomIndex = Math.floor(Math.random() * anecdotes.length);
+		setSelected(randomIndex);
+	};
+
+	const handleVoting = () => {
+		const copy = [...voteArray];
+		copy[selected] += 1;
+		setVoteArray(copy);
+		setMostVotesIndex(copy.indexOf(Math.max(...copy)));
+	};
+
+	return (
+		<div>
+			<h1>Anecdote of the day</h1>
+			{anecdotes[selected]}
+			<p>has {voteArray[selected]} votes</p>
+			<br />
+			<button onClick={handleVoting}>vote</button>
+			<button onClick={handleSelected}>next anecdote</button>
+			<h1>Anecdote with most votes</h1>
+			{anecdotes[mostVotesIndex]}
+			<p>has {voteArray[mostVotesIndex]} votes</p>
+		</div>
+	);
 };
 
 export default App;
