@@ -20,6 +20,12 @@ const App = () => {
 		});
 	}, []);
 
+	const setNotification = (error, message) => {
+		setIsError(error);
+		setMessage(message);
+		setTimeout(() => setMessage(null), 5000);
+	};
+
 	const updateNumber = (newPerson) => {
 		const { id } = persons.find((person) => newPerson.name === person.name);
 
@@ -30,18 +36,13 @@ const App = () => {
 				.updatePersons(id, newPerson)
 				.then((returnedPersons) => {
 					setPersons(persons.map((p) => (p.id !== id ? p : returnedPersons)));
-					setIsError(true);
-					setMessage(
+					setNotification(
+						false,
 						`Number of ${newPerson.name} has been changed to ${newPerson.number}`
 					);
-					setTimeout(() => setMessage(null), 5000);
 				})
-				.catch((e) => {
-					setIsError(true);
-					setMessage(
-						`Information of ${newPerson.name} has already been removed from server`
-					);
-					setTimeout(() => setMessage(null), 5000);
+				.catch((error) => {
+					setNotification(true, error.response.data.error);
 				});
 	};
 
@@ -53,12 +54,15 @@ const App = () => {
 		if (persons.some((person) => person.name === newName))
 			updateNumber(newPerson);
 		else {
-			personsService.addPerson(newPerson).then((returnedPersons) => {
-				setPersons(persons.concat(returnedPersons));
-			});
-			setIsError(true);
-			setMessage(`Added ${newName}`);
-			setTimeout(() => setMessage(null), 5000);
+			personsService
+				.addPerson(newPerson)
+				.then((returnedPersons) => {
+					setPersons(persons.concat(returnedPersons));
+					setNotification(false, `Added ${newName}`);
+				})
+				.catch((error) => {
+					setNotification(true, error.response.data.error);
+				});
 		}
 	};
 
