@@ -1,0 +1,9 @@
+POST http://localhost:3001/api/blogs/
+Content-Type: application/json
+
+{
+    "title": "Natasha's Blog",
+    "author": "Natasha",
+    "url": "made-up-url2.com",
+    "likes": 5121
+}
