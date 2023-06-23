@@ -1,9 +1,10 @@
 POST http://localhost:3001/api/blogs/
 Content-Type: application/json
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IlhEREQiLCJpZCI6IjY0OTViNmJiM2FkMmQ4MGZhMjI1ZDNkZiIsImlhdCI6MTY4NzUzODg1MCwiZXhwIjoxNjg3NTQyNDUwfQ.lwZh-lCp7lGaWTWM8cD5DpkRcccPgDGR2yXZ8INaB4Q
 
 {
-    "title": "Przemek's Blog",
-    "author": "Przemek",
+    "title": "Someone's Blog",
+    "author": "dasdad",
     "url": "made-up-url2.com",
-    "likes": 12
+    "likes": 11
 }
