@@ -14,6 +14,13 @@ beforeEach(async () => {
 	const blogObjects = helper.initialBlogs.map((blog) => new Blog(blog));
 	const promiseArray = blogObjects.map((blog) => blog.save());
 	await Promise.all(promiseArray);
+
+	await User.deleteMany({});
+
+	const passwordHash = await bcrypt.hash('sekret', 10);
+	const user = new User({ username: 'root', name: 'Przemek', passwordHash });
+
+	await user.save();
 });
 
 describe('when there is initially some blogs saved', () => {
@@ -38,6 +45,10 @@ describe('when there is initially some blogs saved', () => {
 describe('addition of a new blog', () => {
 	//4.10
 	test('succeeds if new blog post is in a correct format', async () => {
+		const login = await api
+			.post('/api/login')
+			.send({ username: 'root', password: 'sekret' });
+
 		const newBlogPost = {
 			title: 'About Fullstack Development',
 			author: 'Przemek',
@@ -47,6 +58,7 @@ describe('addition of a new blog', () => {
 
 		await api
 			.post('/api/blogs')
+			.set('Authorization', `bearer ${login.body.token}`)
 			.send(newBlogPost)
 			.expect(201)
 			.expect('Content-Type', /application\/json/);
@@ -60,26 +72,42 @@ describe('addition of a new blog', () => {
 
 	//4.11
 	test('succeeds if likes property is missing and adds value 0 to it', async () => {
+		const login = await api
+			.post('/api/login')
+			.send({ username: 'root', password: 'sekret' });
+
 		const newBlogPost = {
 			title: 'About Frontend Development',
 			author: 'Przemek',
 			url: 'made-up-url.com',
 		};
 
-		const response = await api.post('/api/blogs').send(newBlogPost).expect(201);
+		const response = await api
+			.post('/api/blogs')
+			.set('Authorization', `bearer ${login.body.token}`)
+			.send(newBlogPost)
+			.expect(201);
 
 		expect(response.body.likes).toBe(0);
 	});
 
 	//4.12
 	test('fails with code 400 if title is missing', async () => {
+		const login = await api
+			.post('/api/login')
+			.send({ username: 'root', password: 'sekret' });
+
 		const newBlogPost = {
 			author: 'Przemek',
 			url: 'made-up-url.com',
 			likes: 10,
 		};
 
-		await api.post('/api/blogs').send(newBlogPost).expect(400);
+		await api
+			.post('/api/blogs')
+			.set('Authorization', `bearer ${login.body.token}`)
+			.send(newBlogPost)
+			.expect(400);
 
 		const blogsAtEnd = await helper.blogsInDB();
 
@@ -87,13 +115,36 @@ describe('addition of a new blog', () => {
 	});
 
 	test('fails with code 400 if url is missing', async () => {
+		const login = await api
+			.post('/api/login')
+			.send({ username: 'root', password: 'sekret' });
+
 		const newBlogPost = {
 			title: 'About Backend Development',
 			author: 'Przemek',
 			likes: 15,
 		};
 
-		await api.post('/api/blogs').send(newBlogPost).expect(400);
+		await api
+			.post('/api/blogs')
+			.set('Authorization', `bearer ${login.body.token}`)
+			.send(newBlogPost)
+			.expect(400);
+
+		const blogsAtEnd = await helper.blogsInDB();
+
+		expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length);
+	});
+
+	test('fails with code 401 if token is not provided', async () => {
+		const newBlogPost = {
+			title: 'About Fullstack Development',
+			author: 'Przemek',
+			url: 'made-up-url.com',
+			likes: 5,
+		};
+
+		await api.post('/api/blogs').send(newBlogPost).expect(401);
 
 		const blogsAtEnd = await helper.blogsInDB();
 
@@ -104,22 +155,48 @@ describe('addition of a new blog', () => {
 //4.13
 describe('deletion of blog', () => {
 	test('succeeds with code 204 if id is correct', async () => {
-		const blogsAtStart = await helper.blogsInDB();
-		const blogToDelete = blogsAtStart[0];
+		const login = await api
+			.post('/api/login')
+			.send({ username: 'root', password: 'sekret' });
 
-		await api.delete(`/api/blogs/${blogToDelete.id}`).expect(204);
+		const newBlogPost = {
+			title: 'About Fullstack Development',
+			author: 'Przemek',
+			url: 'made-up-url.com',
+			likes: 5,
+		};
+
+		await api
+			.post('/api/blogs')
+			.set('Authorization', `bearer ${login.body.token}`)
+			.send(newBlogPost);
+
+		const blogsAtStart = await helper.blogsInDB();
+		const blogToDelete = blogsAtStart[blogsAtStart.length - 1];
+
+		await api
+			.delete(`/api/blogs/${blogToDelete.id}`)
+			.set('Authorization', `bearer ${login.body.token}`)
+			.expect(204);
 
 		const blogsAtEnd = await helper.blogsInDB();
-		expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length - 1);
+		expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length);
 
 		const titles = blogsAtEnd.map((blog) => blog.title);
 		expect(titles).not.toContain(blogToDelete.title);
 	});
 
 	test('fails with code 400 if id is incorrect', async () => {
+		const login = await api
+			.post('/api/login')
+			.send({ username: 'root', password: 'sekret' });
+
 		const incorrectId = '12414123dqddsd2ed1d1';
 
-		await api.delete(`/api/blogs/${incorrectId}`).expect(400);
+		await api
+			.delete(`/api/blogs/${incorrectId}`)
+			.set('Authorization', `bearer ${login.body.token}`)
+			.expect(400);
 
 		const blogsAtEnd = await helper.blogsInDB();
 		expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length);
@@ -166,15 +243,6 @@ describe('update of blog', () => {
 });
 
 describe('when there is initially one user in db', () => {
-	beforeEach(async () => {
-		await User.deleteMany({});
-
-		const passwordHash = await bcrypt.hash('sekret', 10);
-		const user = new User({ username: 'root', name: 'Przemek', passwordHash });
-
-		await user.save();
-	});
-
 	test('creation succeeds with a fresh username', async () => {
 		const usersAtStart = await helper.usersInDb();
 
@@ -213,6 +281,29 @@ describe('when there is initially one user in db', () => {
 			.expect('Content-Type', /application\/json/);
 
 		expect(result.body.error).toContain('expected `username` to be unique');
+
+		const usersAtEnd = await helper.usersInDb();
+		expect(usersAtEnd).toEqual(usersAtStart);
+	});
+
+	test('creation fails with proper statuscode and message if username is shorter than 3 characters long', async () => {
+		const usersAtStart = await helper.usersInDb();
+
+		const newUser = {
+			username: 'te',
+			name: 'Superuser',
+			password: 'salainen',
+		};
+
+		const result = await api
+			.post('/api/users')
+			.send(newUser)
+			.expect(400)
+			.expect('Content-Type', /application\/json/);
+
+		expect(result.body.error).toContain(
+			'is shorter than the minimum allowed length (3).'
+		);
 
 		const usersAtEnd = await helper.usersInDb();
 		expect(usersAtEnd).toEqual(usersAtStart);
