@@ -1,18 +1,22 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+
 import Blog from './components/Blog';
+import Togglable from './components/Togglable';
+import BlogForm from './components/BlogForm';
+import LoginForm from './components/LoginForm';
+
 import blogService from './services/blogs';
 import loginService from './services/login';
 
 const App = () => {
 	const [blogs, setBlogs] = useState([]);
-	const [username, setUsername] = useState('');
-	const [password, setPassword] = useState('');
 	const [user, setUser] = useState(null);
-	const [title, setTitle] = useState('');
-	const [author, setAuthor] = useState('');
-	const [url, setUrl] = useState('');
 	const [notification, setNotification] = useState(null);
 	const [notificationColor, setNotificationColor] = useState(null);
+
+	console.log(user);
+
+	const blogFormRef = useRef();
 
 	useEffect(() => {
 		blogService.getAll().then((blogs) => setBlogs(blogs));
@@ -27,17 +31,13 @@ const App = () => {
 		}
 	}, []);
 
-	const handleLogin = async (e) => {
-		e.preventDefault();
-
+	const handleLogin = async (loginObject) => {
 		try {
-			const user = await loginService.login({ username, password });
+			const user = await loginService.login(loginObject);
 
 			window.localStorage.setItem('loggedBlogappUser', JSON.stringify(user));
 			blogService.setToken(user.token);
 			setUser(user);
-			setUsername('');
-			setPassword('');
 		} catch (exception) {
 			setNotification('wrong username or password');
 			setNotificationColor('red');
@@ -53,11 +53,10 @@ const App = () => {
 		window.location.reload();
 	};
 
-	const handleCreation = async (e) => {
-		e.preventDefault();
-
+	const handleCreation = async (blogObject) => {
 		try {
-			const newBlog = await blogService.create({ title, author, url });
+			const newBlog = await blogService.create(blogObject);
+			blogFormRef.current.toggleVisibility();
 			setBlogs(blogs.concat(newBlog));
 			setNotification(`a new blog ${newBlog.title} by ${newBlog.author}`);
 			setNotificationColor('green');
@@ -75,11 +74,14 @@ const App = () => {
 		}
 	};
 
+	const sortBlogs = () => {
+		const sortedBlogs = [...blogs].sort((a, b) => b.likes - a.likes);
+		setBlogs(sortedBlogs);
+	};
+
 	if (user === null) {
 		return (
 			<div>
-				<h2>log in to application</h2>
-
 				{notification && (
 					<h2
 						style={{
@@ -90,27 +92,7 @@ const App = () => {
 					</h2>
 				)}
 
-				<form onSubmit={handleLogin}>
-					<div>
-						username{' '}
-						<input
-							type="text"
-							value={username}
-							name="Username"
-							onChange={({ target }) => setUsername(target.value)}
-						/>
-					</div>
-					<div>
-						password{' '}
-						<input
-							type="text"
-							value={password}
-							name="Username"
-							onChange={({ target }) => setPassword(target.value)}
-						/>
-					</div>
-					<button type="submit">login</button>
-				</form>
+				<LoginForm onLogin={handleLogin} />
 			</div>
 		);
 	}
@@ -118,8 +100,6 @@ const App = () => {
 	return (
 		<>
 			<div>
-				<h2>create new</h2>
-
 				{notification && (
 					<h2
 						style={{
@@ -130,46 +110,25 @@ const App = () => {
 					</h2>
 				)}
 
-				<form onSubmit={handleCreation}>
-					<div>
-						title:{' '}
-						<input
-							type="text"
-							value={title}
-							name="Title"
-							onChange={({ target }) => setTitle(target.value)}
-						/>
-					</div>
-					<div>
-						author:{' '}
-						<input
-							type="text"
-							value={author}
-							name="Author"
-							onChange={({ target }) => setAuthor(target.value)}
-						/>
-					</div>
-					<div>
-						url:{' '}
-						<input
-							type="text"
-							value={url}
-							name="Url"
-							onChange={({ target }) => setUrl(target.value)}
-						/>
-					</div>
-					<button type="submit">create</button>
-				</form>
-			</div>
-
-			<div>
 				<h2>blogs</h2>
+
 				<p>
 					{user.name} logged in <button onClick={handleLogout}>logout</button>
 				</p>
 
+				<Togglable buttonLabel="new note" ref={blogFormRef}>
+					<BlogForm
+						onCreation={handleCreation}
+						notification={notification}
+						notificationColor={notificationColor}
+					/>
+				</Togglable>
+
+				<br />
+				<button onClick={sortBlogs}>sort blogs</button>
+
 				{blogs.map((blog) => (
-					<Blog key={blog.id} blog={blog} />
+					<Blog key={blog.id} blog={blog} username={user.username} />
 				))}
 			</div>
 		</>
