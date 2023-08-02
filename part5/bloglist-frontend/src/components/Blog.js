@@ -1,5 +1,7 @@
 import { useState } from 'react';
 
+import PropTypes from 'prop-types';
+
 import blogService from '../services/blogs';
 
 const Blog = ({ blog, username }) => {
@@ -56,6 +58,11 @@ const Blog = ({ blog, username }) => {
 			)}
 		</div>
 	);
+};
+
+Blog.propTypes = {
+	blog: PropTypes.object.isRequired,
+	username: PropTypes.string.isRequired,
 };
 
 export default Blog;

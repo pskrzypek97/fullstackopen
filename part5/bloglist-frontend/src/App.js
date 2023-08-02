@@ -14,8 +14,6 @@ const App = () => {
 	const [notification, setNotification] = useState(null);
 	const [notificationColor, setNotificationColor] = useState(null);
 
-	console.log(user);
-
 	const blogFormRef = useRef();
 
 	useEffect(() => {
