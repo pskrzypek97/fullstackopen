@@ -72,6 +72,10 @@ const App = () => {
 		}
 	};
 
+	const handleLikes = async (blog, likes) => {
+		await blogService.update(blog.id, { ...blog, likes: likes + 1 });
+	};
+
 	const sortBlogs = () => {
 		const sortedBlogs = [...blogs].sort((a, b) => b.likes - a.likes);
 		setBlogs(sortedBlogs);
@@ -126,7 +130,12 @@ const App = () => {
 				<button onClick={sortBlogs}>sort blogs</button>
 
 				{blogs.map((blog) => (
-					<Blog key={blog.id} blog={blog} username={user.username} />
+					<Blog
+						key={blog.id}
+						blog={blog}
+						username={user.username}
+						onLikes={handleLikes}
+					/>
 				))}
 			</div>
 		</>

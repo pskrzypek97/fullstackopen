@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 
 import blogService from '../services/blogs';
 
-const Blog = ({ blog, username }) => {
+const Blog = ({ blog, username, onLikes }) => {
 	const [visible, setVisible] = useState(false);
 	const [likes, setLikes] = useState(blog.likes);
 
@@ -20,7 +20,7 @@ const Blog = ({ blog, username }) => {
 		try {
 			setLikes((prevLike) => prevLike + 1);
 
-			await blogService.update(blog.id, { ...blog, likes: likes + 1 });
+			await onLikes(blog, likes);
 		} catch (e) {
 			setLikes(blog.likes);
 		}
@@ -43,18 +43,21 @@ const Blog = ({ blog, username }) => {
 				{visible ? 'hide' : 'view'}
 			</button>
 			{visible && (
-				<>
+				<div className="moreInfo">
 					<br />
 					{blog.url}
 					<br />
-					likes {likes} <button onClick={updateLikes}>like</button>
+					likes {likes}{' '}
+					<button onClick={updateLikes} className="like">
+						like
+					</button>
 					<br />
 					{blog?.user?.name}
 					<br />
 					{blog?.user?.username === username && (
 						<button onClick={removeBlog}>remove</button>
 					)}
-				</>
+				</div>
 			)}
 		</div>
 	);
@@ -63,6 +66,7 @@ const Blog = ({ blog, username }) => {
 Blog.propTypes = {
 	blog: PropTypes.object.isRequired,
 	username: PropTypes.string.isRequired,
+	onLikes: PropTypes.func.isRequired,
 };
 
 export default Blog;
