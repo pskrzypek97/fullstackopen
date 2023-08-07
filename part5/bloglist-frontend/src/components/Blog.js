@@ -37,8 +37,10 @@ const Blog = ({ blog, username, onLikes }) => {
 	};
 
 	return (
-		<div style={blogStyle}>
-			{blog.title} by {blog.author}
+		<div style={blogStyle} className="blog">
+			<span>
+				{blog.title} by {blog.author}
+			</span>
 			<button onClick={() => setVisible(!visible)}>
 				{visible ? 'hide' : 'view'}
 			</button>

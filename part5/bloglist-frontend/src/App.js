@@ -4,6 +4,7 @@ import Blog from './components/Blog';
 import Togglable from './components/Togglable';
 import BlogForm from './components/BlogForm';
 import LoginForm from './components/LoginForm';
+import Notification from './components/Notification';
 
 import blogService from './services/blogs';
 import loginService from './services/login';
@@ -85,13 +86,10 @@ const App = () => {
 		return (
 			<div>
 				{notification && (
-					<h2
-						style={{
-							backgroundColor: `${notificationColor}`,
-						}}
-					>
-						{notification}
-					</h2>
+					<Notification
+						notification={notification}
+						notificationColor={notificationColor}
+					/>
 				)}
 
 				<LoginForm onLogin={handleLogin} />
@@ -103,13 +101,10 @@ const App = () => {
 		<>
 			<div>
 				{notification && (
-					<h2
-						style={{
-							backgroundColor: `${notificationColor}`,
-						}}
-					>
-						{notification}
-					</h2>
+					<Notification
+						notification={notification}
+						notificationColor={notificationColor}
+					/>
 				)}
 
 				<h2>blogs</h2>
