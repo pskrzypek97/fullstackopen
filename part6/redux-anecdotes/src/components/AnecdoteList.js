@@ -23,12 +23,11 @@ const AnecdoteList = () => {
 			? anecdotes.filter((a) => a.content.includes(filter))
 			: anecdotes;
 	});
-
 	const dispatch = useDispatch();
 
 	const vote = (id, content) => {
-		dispatch(voteAnecdote(id));
-		dispatch(setNotification(`you voted "${content}"`));
+		dispatch(voteAnecdote(id, anecdotes));
+		dispatch(setNotification(`you voted "${content}"`, 5));
 	};
 
 	return (
