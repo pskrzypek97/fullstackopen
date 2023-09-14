@@ -1,0 +1,44 @@
+{
+  "notes": [
+    {
+      "content": "the app state is in redux store",
+      "important": false,
+      "id": 1
+    },
+    {
+      "content": "state changes are made with actions",
+      "important": true,
+      "id": 2
+    },
+    {
+      "content": "dadsadada",
+      "important": false,
+      "id": 3
+    },
+    {
+      "content": "dadsadadsad",
+      "id": 4
+    },
+    {
+      "content": "XDDDDDDDDDDDDDDDDd",
+      "id": 5
+    }
+  ],
+  "persons": [
+    {
+      "name": "Bizzle",
+      "number": "92414-21331-312",
+      "id": 1
+    },
+    {
+      "name": "Shmizzle",
+      "number": "14-21331-312",
+      "id": 2
+    },
+    {
+      "name": "Hemshlo",
+      "number": "40942094820489032",
+      "id": 3
+    }
+  ]
+}
