@@ -1,0 +1,13 @@
+POST http://localhost:3001/api/blogs/64904fb87f2e90fd7e3d0239/comments
+Content-Type: application/json
+
+{
+    "blog": {
+        "title": "Natasha's Blog",
+        "author": "Natasha",
+        "url": "made-up-url2.com",
+        "likes": 0,
+        "id": "64904fb87f2e90fd7e3d0239"
+    },
+    "comment": "dupa xD"
+}

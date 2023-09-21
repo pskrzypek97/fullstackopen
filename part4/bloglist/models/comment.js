@@ -1,31 +1,19 @@
 const mongoose = require('mongoose');
 
-const blogSchema = new mongoose.Schema({
-	title: {
+const commentSchema = new mongoose.Schema({
+	comment: {
 		type: String,
 		required: true,
 	},
-	author: String,
-	url: {
-		type: String,
-		required: true,
-	},
-	likes: Number,
-	user: {
+	blog: {
 		type: mongoose.Schema.Types.ObjectId,
-		ref: 'User',
+		ref: 'Blog',
 	},
-	comments: [
-		{
-			type: mongoose.Schema.Types.ObjectId,
-			ref: 'Comment',
-		},
-	],
 });
 
 //changing _id property (Object) to id (String)
 //and removing _id and __v
-blogSchema.set('toJSON', {
+commentSchema.set('toJSON', {
 	transform: (document, returnedObject) => {
 		returnedObject.id = returnedObject._id.toString();
 		delete returnedObject._id;
@@ -33,4 +21,6 @@ blogSchema.set('toJSON', {
 	},
 });
 
-module.exports = mongoose.model('Blog', blogSchema);
+const Comment = mongoose.model('Comment', commentSchema);
+
+module.exports = Comment;
