@@ -4,6 +4,8 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import { Routes, Route, useMatch } from 'react-router-dom';
 
+import { Button } from 'react-bootstrap';
+
 import { initializeBlogs, setBlogs } from './store/reducers/blogReducers';
 import { setUser } from './store/reducers/userReducers';
 
@@ -63,7 +65,7 @@ const App = () => {
 
     if (user === null) {
         return (
-            <div>
+            <div className="container">
                 <Notification />
 
                 <LoginForm />
@@ -72,7 +74,7 @@ const App = () => {
     }
 
     return (
-        <div>
+        <div className="container">
             <Navigation />
 
             <Notification />
@@ -91,7 +93,7 @@ const App = () => {
                             </Togglable>
 
                             <br />
-                            <button onClick={sortBlogs}>sort blogs</button>
+                            <Button onClick={sortBlogs}>sort blogs</Button>
 
                             {blogs.map((blog) => (
                                 <Blog key={blog.id} blog={blog} />

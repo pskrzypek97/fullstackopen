@@ -2,6 +2,8 @@ import { useSelector } from 'react-redux/es/hooks/useSelector';
 
 import { Link } from 'react-router-dom';
 
+import { Navbar, Nav, Button } from 'react-bootstrap';
+
 const Navigation = () => {
     const user = useSelector((state) => state.user);
 
@@ -10,21 +12,32 @@ const Navigation = () => {
         window.location.reload();
     };
 
-    const bStyle = { marginRight: '5px' };
+    const padding = { padding: '5px' };
+
+    const spanStyle = { color: 'white', padding: 5 };
 
     return (
-        <div style={{ backgroundColor: 'grey', padding: '5px' }}>
-            <b style={bStyle}>
-                <Link to={'/'}>blogs</Link>
-            </b>
-            <b style={bStyle}>
-                <Link to={'/users'}>users</Link>
-            </b>
-            <span>
-                {user.name} logged in{' '}
-                <button onClick={handleLogout}>logout</button>
-            </span>
-        </div>
+        <Navbar collapseOnSelect expand="lg" bg="dark" variant="dark">
+            <Navbar.Toggle aria-controls="responsive-navbar-nav" />
+            <Navbar.Collapse id="responsive-navbar-nav">
+                <Nav className="me-auto">
+                    <Nav.Link href="#" as="span">
+                        <Link to={'/'} style={padding}>
+                            blogs
+                        </Link>
+                    </Nav.Link>
+                    <Nav.Link href="#" as="span">
+                        <Link to={'/users'} style={padding}>
+                            users
+                        </Link>
+                    </Nav.Link>
+                    <div>
+                        <span style={spanStyle}>{user.name} logged in </span>
+                        <Button onClick={handleLogout}>logout</Button>
+                    </div>
+                </Nav>{' '}
+            </Navbar.Collapse>
+        </Navbar>
     );
 };
 

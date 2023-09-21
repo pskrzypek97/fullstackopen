@@ -3,6 +3,8 @@ import { useState, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
+import { Button, Form, ListGroup } from 'react-bootstrap';
+
 import { voteBlog, deleteBlog } from '../store/reducers/blogReducers';
 import { setNotification } from '../store/reducers/notificationReducer';
 
@@ -24,7 +26,10 @@ const BlogPage = ({ blog, username }) => {
 
             dispatch(
                 setNotification(
-                    { message: `blog ${blog.title} is liked`, color: 'green' },
+                    {
+                        message: `blog ${blog.title} is liked`,
+                        variant: 'success',
+                    },
                     5
                 )
             );
@@ -43,7 +48,7 @@ const BlogPage = ({ blog, username }) => {
                     setNotification(
                         {
                             message: `removed ${blog.title} blog`,
-                            color: 'green',
+                            variant: 'success',
                         },
                         5
                     )
@@ -65,6 +70,16 @@ const BlogPage = ({ blog, username }) => {
             });
 
             setComments(comments.concat(savedComment));
+
+            dispatch(
+                setNotification(
+                    {
+                        message: `you commented ${blog.title} by ${blog.author}`,
+                        variant: 'success',
+                    },
+                    5
+                )
+            );
         } catch (exception) {
             console.log(exception);
         }
@@ -79,20 +94,25 @@ const BlogPage = ({ blog, username }) => {
             <h3>{blog.title}</h3>
             <a href={blog.url}>{blog.url}</a>
             <div>
-                {blog.likes} likes <button onClick={updateLikes}>like</button>
+                {blog.likes} likes{' '}
+                <Button variant="success" onClick={updateLikes}>
+                    like
+                </Button>
             </div>
             <div>added by {blog.author}</div>
             {blog.user?.username === username && (
                 <div>
-                    <button onClick={removeBlog}>remove</button>
+                    <Button variant="danger" onClick={removeBlog}>
+                        remove
+                    </Button>
                 </div>
             )}
             <br />
 
             <b>comments</b>
             <br />
-            <form onSubmit={handleComments}>
-                <input
+            <Form onSubmit={handleComments}>
+                <Form.Control
                     id="comment"
                     type="text"
                     value={comment}
@@ -100,12 +120,14 @@ const BlogPage = ({ blog, username }) => {
                     placeholder="Comment"
                     onChange={({ target }) => setComment(target.value)}
                 />
-                <button>add comment</button>
-            </form>
-            <ul>
+                <Button type="submit">add comment</Button>
+            </Form>
+            <ListGroup>
                 {comments &&
-                    comments.map((c) => <li key={c.id}>{c.comment}</li>)}
-            </ul>
+                    comments.map((c) => (
+                        <ListGroup.Item key={c.id}>{c.comment}</ListGroup.Item>
+                    ))}
+            </ListGroup>
         </>
     );
 };
