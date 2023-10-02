@@ -1,8 +1,9 @@
 import { useState } from 'react';
 
+import { TextField, Button } from '@mui/material';
+
 import loginService from '../services/login';
 import blogService from '../services/blog';
-
 import { useUserDispatch } from '../store/UserContext';
 import { useNotificationDispatch } from '../store/NotificationContext';
 
@@ -25,7 +26,7 @@ const LoginForm = () => {
 		} catch (exception) {
 			notificationDispatch({
 				type: 'CREATE',
-				payload: { value: 'wrong username or password', color: 'red' },
+				payload: { value: 'wrong username or password', severity: 'error' },
 			});
 			setTimeout(() => {
 				notificationDispatch({ type: 'REMOVE' });
@@ -41,8 +42,8 @@ const LoginForm = () => {
 
 			<form onSubmit={handleLogin} className="loginForm">
 				<div>
-					username{' '}
-					<input
+					<label htmlFor="username">username </label>
+					<TextField
 						type="text"
 						value={username}
 						name="Username"
@@ -51,8 +52,8 @@ const LoginForm = () => {
 					/>
 				</div>
 				<div>
-					password{' '}
-					<input
+					<label htmlFor="password">password </label>
+					<TextField
 						type="text"
 						value={password}
 						name="Password"
@@ -60,9 +61,9 @@ const LoginForm = () => {
 						onChange={({ target }) => setPassword(target.value)}
 					/>
 				</div>
-				<button type="submit" className="login-button">
+				<Button variant="contained" type="submit" className="login-button">
 					login
-				</button>
+				</Button>
 			</form>
 		</div>
 	);

@@ -1,6 +1,8 @@
 import { useState } from 'react';
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import PropTypes from 'prop-types';
+import { TextField, Button } from '@mui/material';
 
 import blogService from '../services/blog';
 import { useNotificationDispatch } from '../store/NotificationContext';
@@ -28,7 +30,7 @@ const BlogForm = ({ blogFormRef }) => {
 				type: 'CREATE',
 				payload: {
 					value: `a new blog ${title} by ${author}`,
-					color: 'green',
+					severity: 'success',
 				},
 			});
 			setTimeout(() => {
@@ -37,7 +39,7 @@ const BlogForm = ({ blogFormRef }) => {
 		} catch (exception) {
 			notificationDispatch({
 				type: 'CREATE',
-				payload: { value: exception, color: 'red' },
+				payload: { value: exception, severity: 'error' },
 			});
 			setTimeout(() => {
 				notificationDispatch({ type: 'REMOVE' });
@@ -54,8 +56,8 @@ const BlogForm = ({ blogFormRef }) => {
 
 			<form onSubmit={addBlog}>
 				<div>
-					title:{' '}
-					<input
+					<label htmlFor="title">title: </label>
+					<TextField
 						id="title"
 						type="text"
 						value={title}
@@ -65,8 +67,8 @@ const BlogForm = ({ blogFormRef }) => {
 					/>
 				</div>
 				<div>
-					author:{' '}
-					<input
+					<label htmlFor="author">author: </label>
+					<TextField
 						id="author"
 						type="text"
 						value={author}
@@ -76,8 +78,8 @@ const BlogForm = ({ blogFormRef }) => {
 					/>
 				</div>
 				<div>
-					url:{' '}
-					<input
+					<label htmlFor="url">url: </label>
+					<TextField
 						id="url"
 						type="text"
 						value={url}
@@ -86,12 +88,16 @@ const BlogForm = ({ blogFormRef }) => {
 						onChange={({ target }) => setUrl(target.value)}
 					/>
 				</div>
-				<button type="submit" className="create-button">
+				<Button variant="contained" type="submit" className="create-button">
 					create
-				</button>
+				</Button>
 			</form>
 		</div>
 	);
+};
+
+BlogForm.propTypes = {
+	blogFormRef: PropTypes.object.isRequired,
 };
 
 export default BlogForm;

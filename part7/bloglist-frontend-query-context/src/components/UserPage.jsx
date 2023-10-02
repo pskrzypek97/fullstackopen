@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import PropTypes from 'prop-types';
 
 const UserPage = ({ userObject }) => {
 	if (!userObject) return null;
@@ -18,6 +19,10 @@ const UserPage = ({ userObject }) => {
 			</ul>
 		</>
 	);
+};
+
+UserPage.propTypes = {
+	userObject: PropTypes.object,
 };
 
 export default UserPage;

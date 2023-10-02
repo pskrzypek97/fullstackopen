@@ -2,6 +2,7 @@ import { useEffect, useState, useRef } from 'react';
 
 import { useQuery } from '@tanstack/react-query';
 import { Routes, Route, useMatch } from 'react-router-dom';
+import { Container, Button, Box } from '@mui/material';
 
 import Blog from './components/Blog';
 import Togglable from './components/Togglable';
@@ -47,12 +48,9 @@ const App = () => {
 			userDispatch({ type: 'SET_USER', payload: user });
 			blogService.setToken(user.token);
 		}
-	}, []);
 
-	const handleLogout = () => {
-		window.localStorage.clear();
-		window.location.reload();
-	};
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, []);
 
 	const sortBlogs = () => {
 		setSortedBlogs([...blogs].sort((a, b) => b.likes - a.likes));
@@ -73,39 +71,37 @@ const App = () => {
 
 	if (user === null) {
 		return (
-			<div>
+			<Container>
 				{notification && <Notification />}
 
 				<LoginForm />
-			</div>
+			</Container>
 		);
 	}
 
 	return (
-		<>
-			<div>
-				{notification && <Notification />}
+		<Container>
+			<Navigation />
 
-				<Navigation />
+			{notification && <Notification />}
 
-				<h2>blogs</h2>
+			<h2>Blogs</h2>
 
-				<p>
-					{user.name} logged in <button onClick={handleLogout}>logout</button>
-				</p>
+			<Routes>
+				<Route
+					path="/"
+					element={
+						<>
+							<Togglable buttonLabel="new note" ref={blogFormRef}>
+								<BlogForm blogFormRef={blogFormRef} />
+							</Togglable>
 
-				<Routes>
-					<Route
-						path="/"
-						element={
-							<>
-								<Togglable buttonLabel="new note" ref={blogFormRef}>
-									<BlogForm blogFormRef={blogFormRef} />
-								</Togglable>
+							<br />
+							<Button variant="outlined" onClick={sortBlogs}>
+								sort blogs
+							</Button>
 
-								<br />
-								<button onClick={sortBlogs}>sort blogs</button>
-
+							<Box>
 								{!sortedBlogs &&
 									blogs.map((blog) => (
 										<Blog key={blog.id} blog={blog} username={user.username} />
@@ -115,21 +111,21 @@ const App = () => {
 									sortedBlogs.map((b) => (
 										<Blog key={b.id} blog={b} username={user.username} />
 									))}
-							</>
-						}
-					/>
-					<Route path="/users" element={<UserList users={users} />} />
-					<Route
-						path="/users/:id"
-						element={<UserPage userObject={userObject} />}
-					/>
-					<Route
-						path="/blogs/:id"
-						element={<BlogPage blog={blogObject} username={user.username} />}
-					/>
-				</Routes>
-			</div>
-		</>
+							</Box>
+						</>
+					}
+				/>
+				<Route path="/users" element={<UserList users={users} />} />
+				<Route
+					path="/users/:id"
+					element={<UserPage userObject={userObject} />}
+				/>
+				<Route
+					path="/blogs/:id"
+					element={<BlogPage blog={blogObject} username={user.username} />}
+				/>
+			</Routes>
+		</Container>
 	);
 };
 

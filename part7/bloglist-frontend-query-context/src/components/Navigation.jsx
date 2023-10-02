@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { AppBar, Toolbar, Button } from '@mui/material';
 
 import { useUserValue } from '../store/UserContext';
 
@@ -10,27 +11,29 @@ const Navigation = () => {
 		window.location.reload();
 	};
 
-	const padding = { padding: '5px' };
-
-	const navStyle = { backgroundColor: 'grey' };
-
 	const spanStyle = { color: 'white', padding: 5 };
 
 	return (
-		<nav style={navStyle}>
-			<Link to={'/'} style={padding}>
-				blogs
-			</Link>
+		<AppBar position="static">
+			<Toolbar>
+				<Button color="inherit" component={Link} to="/">
+					home
+				</Button>
 
-			<Link to={'/users'} style={padding}>
-				users
-			</Link>
+				<Button color="inherit" component={Link} to="/users">
+					users
+				</Button>
 
-			<div>
-				<span style={spanStyle}>{user.name} logged in </span>
-				<button onClick={handleLogout}>logout</button>
-			</div>
-		</nav>
+				{user && (
+					<>
+						<Button color="inherit" onClick={handleLogout}>
+							logout
+						</Button>
+						<span style={spanStyle}>{user.name} logged in </span>
+					</>
+				)}
+			</Toolbar>
+		</AppBar>
 	);
 };
 

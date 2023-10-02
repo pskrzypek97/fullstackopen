@@ -1,19 +1,28 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
 import { useQueryClient, useMutation } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
+import PropTypes from 'prop-types';
+import {
+	TextField,
+	Button,
+	List,
+	ListItemText,
+	Box,
+	Divider,
+} from '@mui/material';
 
 import blogService from '../services/blog';
+import { useNotificationDispatch } from '../store/NotificationContext';
 
 const BlogPage = ({ blog, username }) => {
-	const [comments, setComments] = useState([]);
 	const [comment, setComment] = useState('');
-
-	useEffect(() => setComments(blog?.comments), []);
 
 	const navigate = useNavigate();
 
 	const queryClient = useQueryClient();
+
+	const notificationDispatch = useNotificationDispatch();
 
 	const updateBlogMutation = useMutation({
 		mutationFn: blogService.update,
@@ -25,9 +34,21 @@ const BlogPage = ({ blog, username }) => {
 		onSuccess: () => queryClient.invalidateQueries({ queryKey: ['blogs'] }),
 	});
 
+	const addCommentMutation = useMutation({
+		mutationFn: blogService.comment,
+		onSuccess: () => queryClient.invalidateQueries({ queryKey: ['blogs'] }),
+	});
+
 	const updateLikes = async () => {
 		try {
 			updateBlogMutation.mutate({ ...blog, likes: blog.likes + 1 });
+			notificationDispatch({
+				type: 'CREATE',
+				payload: { value: `liked ${blog.title}`, severity: 'success' },
+			});
+			setTimeout(() => {
+				notificationDispatch({ type: 'REMOVE' });
+			}, 5000);
 		} catch (e) {
 			console.log(e);
 		}
@@ -37,38 +58,42 @@ const BlogPage = ({ blog, username }) => {
 		try {
 			if (window.confirm(`Remove blog ${blog.title} by ${blog.author}?`)) {
 				deleteBlogMutation.mutate(blog.id);
+				navigate('/');
+				notificationDispatch({
+					type: 'CREATE',
+					payload: { value: `removed ${blog.title}`, severity: 'success' },
+				});
+				setTimeout(() => {
+					notificationDispatch({ type: 'REMOVE' });
+				}, 5000);
 			}
 		} catch (e) {
 			console.log(e);
 		}
 	};
 
-	// const handleComments = async (e) => {
-	// 	e.preventDefault();
+	const handleComments = async (e) => {
+		e.preventDefault();
 
-	// 	try {
-	// 		const savedComment = await blogService.comment(blog.id, {
-	// 			...blog,
-	// 			comment,
-	// 		});
+		try {
+			addCommentMutation.mutate({ ...blog, comment });
 
-	// 		setComments(comments.concat(savedComment));
+			notificationDispatch({
+				type: 'CREATE',
+				payload: {
+					value: `added comment ${comment} to ${blog.title}`,
+					severity: 'success',
+				},
+			});
+			setTimeout(() => {
+				notificationDispatch({ type: 'REMOVE' });
+			}, 5000);
+		} catch (exception) {
+			console.log(exception);
+		}
 
-	// 		dispatch(
-	// 			setNotification(
-	// 				{
-	// 					message: `you commented ${blog.title} by ${blog.author}`,
-	// 					variant: 'success',
-	// 				},
-	// 				5
-	// 			)
-	// 		);
-	// 	} catch (exception) {
-	// 		console.log(exception);
-	// 	}
-
-	// 	setComment('');
-	// };
+		setComment('');
+	};
 
 	if (!blog) return null;
 
@@ -77,20 +102,20 @@ const BlogPage = ({ blog, username }) => {
 			<h3>{blog.title}</h3>
 			<a href={blog.url}>{blog.url}</a>
 			<div>
-				{blog.likes} likes <button onClick={updateLikes}>like</button>
+				{blog.likes} likes <Button onClick={updateLikes}>like</Button>
 			</div>
 			<div>added by {blog.author}</div>
 			{blog.user?.username === username && (
 				<div>
-					<button onClick={removeBlog}>remove</button>
+					<Button onClick={removeBlog}>remove</Button>
 				</div>
 			)}
 			<br />
 
 			<b>comments</b>
 			<br />
-			{/* <form onSubmit={handleComments}>
-				<input
+			<form onSubmit={handleComments}>
+				<TextField
 					id="comment"
 					type="text"
 					value={comment}
@@ -98,13 +123,26 @@ const BlogPage = ({ blog, username }) => {
 					placeholder="Comment"
 					onChange={({ target }) => setComment(target.value)}
 				/>
-				<button type="submit">add comment</button>
-			</form> */}
-			<ul>
-				{comments && comments.map((c) => <li key={c.id}>{c.comment}</li>)}
-			</ul>
+				<Button type="submit">add comment</Button>
+			</form>
+			<Box>
+				<List>
+					{blog.comments &&
+						blog.comments.map((c) => (
+							<div key={c.id}>
+								<ListItemText primary={c.comment} />
+								<Divider />
+							</div>
+						))}
+				</List>
+			</Box>
 		</>
 	);
+};
+
+BlogPage.propTypes = {
+	blog: PropTypes.object,
+	username: PropTypes.string.isRequired,
 };
 
 export default BlogPage;

@@ -1,17 +1,14 @@
+import { Alert } from '@mui/material';
+
 import { useNotificationValue } from '../store/NotificationContext';
 
 const Notification = () => {
-	const { value, color } = useNotificationValue();
+	const { value, severity } = useNotificationValue();
 
 	return (
-		<h2
-			style={{
-				backgroundColor: `${color}`,
-			}}
-			className="notification"
-		>
+		<Alert className="notification" severity={severity}>
 			{value}
-		</h2>
+		</Alert>
 	);
 };
 
