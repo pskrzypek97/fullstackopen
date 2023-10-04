@@ -1,0 +1,21 @@
+{
+	"name": "books-authors",
+	"version": "1.0.0",
+	"description": "Exercises for GraphQL part",
+	"main": "index.js",
+	"scripts": {
+		"start": "node index.js",
+		"dev": "nodemon index.js",
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"author": "pskrzypek97",
+	"license": "ISC",
+	"dependencies": {
+		"@apollo/server": "^4.9.3",
+		"graphql": "^16.8.1",
+		"uuid": "^9.0.1"
+	},
+	"devDependencies": {
+		"nodemon": "^3.0.1"
+	}
+}
